@@ -2,7 +2,7 @@
 // @name            Motonet: Show product description
 // @name:fi         Motonet: Näytä tuotekuvaus
 // @namespace       https://github.com/AutomotiveLily/userscript
-// @version         0.2
+// @version         0.3
 // @downloadURL     https://github.com/AutomotiveLily/userscript/raw/main/Motonet-%20Show%20product%20description.user.js
 // @updateURL       https://github.com/AutomotiveLily/userscript/raw/main/Motonet-%20Show%20product%20description.user.js
 // @description     Change to product description tab after loading the page.
@@ -11,23 +11,40 @@
 // @match           https://www.motonet.fi/*
 // @icon            https://www.google.com/s2/favicons?sz=64&domain=motonet.fi
 // @grant           none
+// @run-at          document-idle
 // ==/UserScript==
 
-// Modified from this script: https://stackoverflow.com/a/19343058
+(function() {
+  'use strict';
 
-// Wait for the page to load.
-// Odota että sivu latautuu.
-setTimeout (clickLinkWithText, 1000, "Tuotekuvaus");
+  var $ = window.jQuery;
 
-function clickLinkWithText (linkText) {
+  if (!$) {
+    console.error('jQuery not found');
+    return;
+  }
+
+  $(document).ready(function() {
+    setImmediate(function() {
+      clickLinkWithText("Tuotekuvaus");
+      disableTabSaldotiedot();
+    });
+  });
+
+  function clickLinkWithText(linkText) {
     var targetLink = $("a:contains('" + linkText + "')");
     if (targetLink.length) {
-        triggerMouseEvent (targetLink[0], "click");
+      triggerMouseEvent(targetLink[0], "click");
     }
-}
+  }
 
-function triggerMouseEvent (node, eventType) {
+  function triggerMouseEvent(node, eventType) {
     var clickEvent = document.createEvent('MouseEvents');
-    clickEvent.initEvent (eventType, true, true);
-    node.dispatchEvent (clickEvent);
-}
+    clickEvent.initEvent(eventType, true, true);
+    node.dispatchEvent(clickEvent);
+  }
+
+  function disableTabSaldotiedot() {
+    $('#tab-saldotiedot').off('click');
+  }
+})();
